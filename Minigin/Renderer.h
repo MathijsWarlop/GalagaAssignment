@@ -7,7 +7,7 @@ namespace dae
 	class Texture2D;
 	/**
 	 * Simple RAII wrapper for the SDL renderer
-	 */
+	 */ //test
 	class Renderer final : public Singleton<Renderer>
 	{
 		SDL_Renderer* m_renderer{};
