@@ -12,6 +12,8 @@
 //
 #include <chrono>
 #include <thread>
+#include "FPSCounter.h"
+#include "Scene.h"
 
 SDL_Window* g_window{};
 
@@ -84,16 +86,13 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	auto& renderer = Renderer::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
-	auto& input = InputManager::GetInstance();
+	auto scene = sceneManager.GetActiveScene(); // Get active scene
 
-	// todo: this update loop could use some work.
-	//bool doContinue = true;
-	//while (doContinue)
-	//{
-	//	doContinue = input.ProcessInput();
-	//	sceneManager.Update();
-	//	renderer.Render();
-	//}
+	//scene;
+	auto fpsCounter = std::make_shared<FPSCounter>();
+	scene->Add(fpsCounter);
+
+	auto& input = InputManager::GetInstance();
 
 	// new update loop
 	const float fixed_time_step = 1.0f / 60.0f; // Example: 60 updates per second

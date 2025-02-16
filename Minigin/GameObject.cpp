@@ -1,26 +1,48 @@
-#include <string>
 #include "GameObject.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
 
-dae::GameObject::~GameObject() = default;
-
-void dae::GameObject::Update(){}
-
-void dae::GameObject::FixedUpdate(const float& fixedTimeStep) { fixedTimeStep; }
-
-void dae::GameObject::Render() const
+namespace dae
 {
-	const auto& pos = m_transform.GetPosition();
-	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
-}
+    GameObject::~GameObject() = default;
 
-void dae::GameObject::SetTexture(const std::string& filename)
-{
-	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
-}
+    void GameObject::Update()
+    {
+        for (auto& component : m_components)
+        {
+            component->Update();
+        }
+    }
 
-void dae::GameObject::SetPosition(float x, float y)
-{
-	m_transform.SetPosition(x, y, 0.0f);
+    void GameObject::FixedUpdate(float fixedTimeStep)
+    {
+        for (auto& component : m_components)
+        {
+            component->FixedUpdate(fixedTimeStep);
+        }
+    }
+
+    void GameObject::Render() const
+    {
+        const auto& pos = m_transform.GetPosition();
+        if (m_texture)
+        {
+            Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+        }
+
+        for (const auto& component : m_components)
+        {
+            component->Render();
+        }
+    }
+
+    void GameObject::SetTexture(const std::string& filename)
+    {
+        m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+    }
+
+    void GameObject::SetPosition(float x, float y)
+    {
+        m_transform.SetPosition(x, y, 0.0f);
+    }
 }

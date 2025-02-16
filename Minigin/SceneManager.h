@@ -15,6 +15,8 @@ namespace dae
 		void Update();
 		void FixedUpdate(const float& fixedTimeStep);
 		void Render();
+		dae::Scene* GetActiveScene();
+
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
