@@ -16,9 +16,6 @@
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{78a193c2-b22a-483e-88f1-8ec74abd591e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\GameObjects">
-      <UniqueIdentifier>{f620b913-c297-4b28-8974-63f6f1dae5e9}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -66,9 +63,6 @@
     <ClInclude Include="TextRendererComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="FPSCounter.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -115,9 +109,6 @@
     </ClCompile>
     <ClCompile Include="TextRendererComponent.cpp">
       <Filter>Header Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="FPSCounter.cpp">
-      <Filter>Header Files\GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

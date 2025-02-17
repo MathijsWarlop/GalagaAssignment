@@ -4,7 +4,10 @@
 
 namespace dae
 {
-    GameObject::~GameObject() = default;
+    GameObject::~GameObject()
+    {
+        m_components.clear();
+    }
 
     void GameObject::Update()
     {
@@ -20,6 +23,19 @@ namespace dae
         {
             component->FixedUpdate(fixedTimeStep);
         }
+    }
+
+    void dae::GameObject::LateUpdate()
+    {
+        RemoveMarkedComponents();
+    }
+
+    void dae::GameObject::RemoveMarkedComponents()
+    {
+        m_components.erase(std::remove_if(m_components.begin(), m_components.end(),
+            [](const std::unique_ptr<BaseComponent>& comp) {
+                return comp->IsMarkedForDeletion();
+            }), m_components.end());
     }
 
     void GameObject::Render() const

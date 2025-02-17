@@ -1,4 +1,3 @@
-// FPSCounterComponent.h
 #pragma once
 #include "BaseComponent.h"
 #include <chrono>
@@ -13,12 +12,14 @@ namespace dae
 
         void Update() override;
 
-        int GetFPS() const { return m_FPS; }
+        // Return FPS as a float for decimal precision
+        float GetFPS() const { return m_FPS; }
 
     private:
-        int m_FPS{ 0 };
-        float m_ElapsedTime{ 0.0f };
-        int m_FrameCount{ 0 };
-        std::chrono::high_resolution_clock::time_point m_LastTime;
+        float m_FPS{ 0.0f }; // FPS as a float
+        float m_ElapsedTime{ 0.0f }; // Time elapsed since last FPS update
+        int m_FrameCount{ 0 }; // Number of frames since last FPS update
+
+        std::chrono::high_resolution_clock::time_point m_LastTime; // Last time the FPS was calculated
     };
 }

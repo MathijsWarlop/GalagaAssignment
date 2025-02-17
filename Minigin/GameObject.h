@@ -8,9 +8,11 @@
 #include "BaseComponent.h"
 #include "Texture2D.h"
 
+
+
 namespace dae
 {
-    class GameObject
+    class GameObject final
     {
     public:
         GameObject() = default;
@@ -23,6 +25,7 @@ namespace dae
 
         virtual void Update();
         virtual void FixedUpdate(float fixedTimeStep);
+        void LateUpdate();  //function to clean up deleted components
         virtual void Render() const;
 
         void SetTexture(const std::string& filename);
@@ -41,7 +44,7 @@ namespace dae
         }
 
         template <typename T>
-        void RemoveComponent()
+        void RemoveComponent() //all components of type T
         {
             static_assert(std::is_base_of<BaseComponent, T>::value, "T must inherit from BaseComponent");
 
@@ -54,6 +57,21 @@ namespace dae
             {
                 m_components.erase(it, m_components.end());
             }
+        }
+
+        bool UnregisterComponent(BaseComponent* component) //specific component
+        {
+            auto it = std::remove_if(m_components.begin(), m_components.end(),
+                [&](const std::unique_ptr<BaseComponent>& comp) {
+                    return comp.get() == component;
+                });
+
+            if (it != m_components.end())
+            {
+                m_components.erase(it, m_components.end());
+                return true;
+            }
+            return false;
         }
 
         template <typename T>
@@ -86,9 +104,14 @@ namespace dae
             return false;
         }
 
+        void MarkForDeletion() { m_MarkedForDeletion = true; }
+        bool IsMarkedForDeletion() const { return m_MarkedForDeletion; }
+        void RemoveMarkedComponents(); // Function to remove components marked for deletion
+
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
         Transform m_transform{};
         std::shared_ptr<Texture2D> m_texture;
+        bool m_MarkedForDeletion{ false };  // Flag to track if object should be deleted
     };
 }

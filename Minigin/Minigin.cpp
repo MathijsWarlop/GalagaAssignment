@@ -10,10 +10,12 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 //
+#include "GameObject.h"
 #include <chrono>
 #include <thread>
-#include "FPSCounter.h"
 #include "Scene.h"
+#include "FPSCounterComponent.h"
+#include "TextRendererComponent.h"
 
 SDL_Window* g_window{};
 
@@ -88,9 +90,15 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto& sceneManager = SceneManager::GetInstance();
 	auto scene = sceneManager.GetActiveScene(); // Get active scene
 
-	//scene;
-	auto fpsCounter = std::make_shared<FPSCounter>();
-	scene->Add(fpsCounter);
+	////////////////////wrong, needs to use gameobject without inhereting from it
+	//auto fpsCounter = std::make_shared<FPSCounter>();
+	//scene->Add(fpsCounter);
+	////////////////////new one with GameObject
+	auto fpsCounterObject = std::make_shared<GameObject>();
+	fpsCounterObject->AddComponent<FPSCounterComponent>();
+	fpsCounterObject->AddComponent<TextRendererComponent>("FPS: 0", 2.f, 2.f);
+	scene->Add(fpsCounterObject);
+	////////////////////
 
 	auto& input = InputManager::GetInstance();
 
@@ -112,6 +120,13 @@ void dae::Minigin::Run(const std::function<void()>& load)
 			sceneManager.FixedUpdate(fixed_time_step); //in sceneManager
 			lag -= fixed_time_step;
 		}
+		//fps update
+		auto textRenderer = fpsCounterObject->GetComponent<TextRendererComponent>();
+		auto fpsComponent = fpsCounterObject->GetComponent<FPSCounterComponent>();
+		float fps = fpsComponent->GetFPS();
+		textRenderer->SetText("FPS: " + std::to_string(fps));
+	
+
 		sceneManager.Update();
 		renderer.Render();
 		const auto sleep_time = current_time + std::chrono::milliseconds(ms_per_frame) - std::chrono::high_resolution_clock::now();
