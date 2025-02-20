@@ -8,14 +8,12 @@
 #include "BaseComponent.h"
 #include "Texture2D.h"
 
-
-
 namespace dae
 {
     class GameObject final
     {
     public:
-        GameObject() = default;
+        GameObject();
         virtual ~GameObject();
 
         GameObject(const GameObject& other) = delete;
@@ -25,11 +23,16 @@ namespace dae
 
         virtual void Update();
         virtual void FixedUpdate(float fixedTimeStep);
-        void LateUpdate();  //function to clean up deleted components
+        void LateUpdate();  // Function to clean up deleted components
         virtual void Render() const;
 
         void SetTexture(const std::string& filename);
         void SetPosition(float x, float y);
+
+        // Dirty flag functionality
+        void SetDirty(bool dirty = true);
+        bool IsDirty() const;
+        void UpdateWorldPosition();
 
         template <typename T, typename... Args>
         T* AddComponent(Args&&... args)
@@ -44,7 +47,7 @@ namespace dae
         }
 
         template <typename T>
-        void RemoveComponent() //all components of type T
+        void RemoveComponent() // All components of type T
         {
             static_assert(std::is_base_of<BaseComponent, T>::value, "T must inherit from BaseComponent");
 
@@ -59,7 +62,7 @@ namespace dae
             }
         }
 
-        bool UnregisterComponent(BaseComponent* component) //specific component
+        bool UnregisterComponent(BaseComponent* component) // Specific component
         {
             auto it = std::remove_if(m_components.begin(), m_components.end(),
                 [&](const std::unique_ptr<BaseComponent>& comp) {
@@ -115,7 +118,6 @@ namespace dae
         GameObject* GetParent() const;
         void SetParent(GameObject* parent);
 
-
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
         Transform m_transform{};
@@ -125,5 +127,9 @@ namespace dae
         // Scene graph members
         GameObject* m_parent;                  // Pointer to the parent GameObject
         std::vector<GameObject*> m_children;   // List of child GameObjects
+
+        // Dirty flag functionality
+        bool m_isDirty{ true };                // Indicates if the position has changed
+        glm::vec3 m_worldPosition{ 0.0f };    // Cached world position
     };
 }

@@ -5,6 +5,11 @@
 
 namespace dae
 {
+    GameObject::GameObject()
+        : m_parent(nullptr), m_isDirty(true), m_worldPosition(0.0f, 0.0f, 0.0f)
+    {
+    }
+
     GameObject::~GameObject()
     {
         // Detach from parent if this object is a child
@@ -103,6 +108,46 @@ namespace dae
     void GameObject::SetPosition(float x, float y)
     {
         m_transform.SetPosition(x, y, 0.0f);
+        SetDirty(); // Mark as dirty when position changes
+    }
+
+    // Dirty flag functionality
+    void GameObject::SetDirty(bool dirty)
+    {
+        m_isDirty = dirty;
+        if (dirty)
+        {
+            // Mark all children as dirty
+            for (auto& child : m_children)
+            {
+                child->SetDirty();
+            }
+        }
+    }
+
+    bool GameObject::IsDirty() const
+    {
+        return m_isDirty;
+    }
+
+    void GameObject::UpdateWorldPosition()
+    {
+        if (m_isDirty)
+        {
+            if (m_parent)
+            {
+                // Calculate world position based on parent's world position
+                m_worldPosition = m_parent->m_worldPosition + m_transform.GetPosition();
+            }
+            else
+            {
+                // No parent, so world position is the same as local position
+                m_worldPosition = m_transform.GetPosition();
+            }
+
+            // Mark as clean
+            m_isDirty = false;
+        }
     }
 
     // Scene graph functionality
@@ -119,6 +164,7 @@ namespace dae
             // Attach to this parent
             m_children.push_back(child);
             child->m_parent = this;
+            child->SetDirty(); // Mark child as dirty when parent changes
         }
     }
 
@@ -131,6 +177,7 @@ namespace dae
             {
                 (*it)->m_parent = nullptr;
                 m_children.erase(it);
+                (*it)->SetDirty(); // Mark child as dirty when parent changes
             }
         }
     }
@@ -155,5 +202,6 @@ namespace dae
         {
             m_parent->RemoveChild(this);
         }
+        SetDirty(); // Mark as dirty when parent changes
     }
 }
