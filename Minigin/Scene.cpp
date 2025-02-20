@@ -40,6 +40,13 @@ void Scene::FixedUpdate(const float& fixedTimeStep)
 		object->FixedUpdate(fixedTimeStep);
 	}
 }
+void Scene::LateUpdate()
+{
+	for (auto& object : m_objects)
+	{
+		object->LateUpdate();
+	}
+}
 
 void Scene::Render() const
 {

@@ -13,7 +13,8 @@ namespace dae
 		Scene& CreateScene(const std::string& name);
 
 		void Update();
-		void FixedUpdate(const float& fixedTimeStep);
+		void FixedUpdate(const float& fixedTimeStep); //mainly for physics
+		void LateUpdate(); //for deletion
 		void Render();
 		dae::Scene* GetActiveScene();
 

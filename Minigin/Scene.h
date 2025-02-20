@@ -14,6 +14,7 @@ namespace dae
 
 		void Update();
 		void FixedUpdate(const float& fixedTimeStep);
+		void LateUpdate();
 		void Render() const;
 
 		~Scene();

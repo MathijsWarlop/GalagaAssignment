@@ -108,10 +108,22 @@ namespace dae
         bool IsMarkedForDeletion() const { return m_MarkedForDeletion; }
         void RemoveMarkedComponents(); // Function to remove components marked for deletion
 
+        // Scene graph functionality
+        void AddChild(GameObject* child);
+        void RemoveChild(GameObject* child);
+        const std::vector<GameObject*>& GetChildren() const;
+        GameObject* GetParent() const;
+        void SetParent(GameObject* parent);
+
+
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
         Transform m_transform{};
         std::shared_ptr<Texture2D> m_texture;
         bool m_MarkedForDeletion{ false };  // Flag to track if object should be deleted
+
+        // Scene graph members
+        GameObject* m_parent;                  // Pointer to the parent GameObject
+        std::vector<GameObject*> m_children;   // List of child GameObjects
     };
 }

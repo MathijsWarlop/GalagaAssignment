@@ -15,6 +15,13 @@ void dae::SceneManager::FixedUpdate(const float& fixedTimeStep)
 		scene->FixedUpdate(fixedTimeStep);
 	}
 }
+void dae::SceneManager::LateUpdate()
+{
+	for (auto& scene : m_scenes)
+	{
+		scene->LateUpdate();
+	}
+}
 
 void dae::SceneManager::Render()
 {
