@@ -2,7 +2,7 @@
 #include "ResourceManager.h"
 #include "Renderer.h"
 #include <algorithm>
-
+#include <iostream>
 namespace dae
 {
     GameObject::GameObject()
@@ -31,6 +31,7 @@ namespace dae
 
     void GameObject::Update()
     {
+        //std::cout << "Update() triggered" << std::endl;
         // Update components
         for (auto& component : m_components)
         {
@@ -41,6 +42,11 @@ namespace dae
         for (auto& child : m_children)
         {
             child->Update();
+        }
+
+        if (m_isDirty)
+        {
+            UpdateWorldPosition();
         }
     }
 
@@ -81,13 +87,16 @@ namespace dae
 
     void GameObject::Render() const
     {
-        // Render this object
-        const auto& pos = m_transform.GetPosition();
+        // Use the world position for rendering
+        const auto& pos = m_worldPosition; // Or use m_transform.GetPosition() if you're using it
+        std::cout << "Rendering at position: (" << pos.x << ", " << pos.y << ")" << std::endl;
+
         if (m_texture)
         {
             Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
         }
 
+        // Render components
         for (const auto& component : m_components)
         {
             component->Render();
@@ -108,9 +117,16 @@ namespace dae
     void GameObject::SetPosition(float x, float y)
     {
         m_transform.SetPosition(x, y, 0.0f);
+        UpdateWorldPosition();
+        //std::cout << x << "  " << y << std::endl;
         SetDirty(); // Mark as dirty when position changes
-    }
 
+    }
+    glm::vec3& GameObject::GetPosition()
+    {
+        return m_worldPosition;
+
+    }
     // Dirty flag functionality
     void GameObject::SetDirty(bool dirty)
     {
@@ -132,22 +148,24 @@ namespace dae
 
     void GameObject::UpdateWorldPosition()
     {
-        if (m_isDirty)
+        //std::cout << "UpdateWorldPosition()" << std::endl;
+        if (m_parent)
         {
-            if (m_parent)
-            {
-                // Calculate world position based on parent's world position
-                m_worldPosition = m_parent->m_worldPosition + m_transform.GetPosition();
-            }
-            else
-            {
-                // No parent, so world position is the same as local position
-                m_worldPosition = m_transform.GetPosition();
-            }
-
-            // Mark as clean
-            m_isDirty = false;
+            //std::cout << "parent" << std::endl;
+            // Calculate world position based on parent's world position
+            m_worldPosition = m_parent->m_worldPosition + m_transform.GetPosition();
         }
+        else
+        {
+            // No parent, so world position is the same as local position
+            m_worldPosition = m_transform.GetPosition();
+            //std::cout << m_transform.GetPosition().x << "  " << m_transform.GetPosition().y << std::endl;
+            //std::cout << m_worldPosition.x << "  " << m_worldPosition.y << std::endl;
+        }
+
+        // Mark as clean
+        m_isDirty = false;
+        
     }
 
     // Scene graph functionality

@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "FPSCounterComponent.h"
 #include "TextRendererComponent.h"
+#include "CircularMovementComponent.h"
 
 SDL_Window* g_window{};
 
@@ -90,15 +91,27 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto& sceneManager = SceneManager::GetInstance();
 	auto scene = sceneManager.GetActiveScene(); // Get active scene
 
-	////////////////////wrong, needs to use gameobject without inhereting from it
-	//auto fpsCounter = std::make_shared<FPSCounter>();
-	//scene->Add(fpsCounter);
-	////////////////////new one with GameObject
+	//FPS COUNTER
 	auto fpsCounterObject = std::make_shared<GameObject>();
 	fpsCounterObject->AddComponent<FPSCounterComponent>();
 	fpsCounterObject->AddComponent<TextRendererComponent>("FPS: 0", 2.f, 2.f);
 	scene->Add(fpsCounterObject);
-	////////////////////
+
+	//parent-child test
+	auto circleParent = std::make_shared<dae::GameObject>();
+	circleParent->SetTexture("logo.tga");
+	circleParent->SetPosition(216, 180);
+	circleParent->AddComponent<CircularMovementComponent>(60.f, 5.f);
+	
+	
+	auto circleChild = std::make_shared<dae::GameObject>();
+	circleChild->SetTexture("logo.tga");
+	circleChild->SetPosition(0, 0);
+	circleChild->AddComponent<CircularMovementComponent>(50.f, 9.f);
+	circleParent->AddChild(circleChild.get()); 
+
+	scene->Add(circleParent);
+	scene->Add(circleChild);
 
 	auto& input = InputManager::GetInstance();
 

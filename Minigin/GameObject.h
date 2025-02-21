@@ -28,6 +28,7 @@ namespace dae
 
         void SetTexture(const std::string& filename);
         void SetPosition(float x, float y);
+        glm::vec3& GetPosition();
 
         // Dirty flag functionality
         void SetDirty(bool dirty = true);
@@ -117,6 +118,8 @@ namespace dae
         const std::vector<GameObject*>& GetChildren() const;
         GameObject* GetParent() const;
         void SetParent(GameObject* parent);
+
+        
 
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
