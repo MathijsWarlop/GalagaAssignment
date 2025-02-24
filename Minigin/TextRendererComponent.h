@@ -16,7 +16,7 @@ namespace dae
         ~TextRendererComponent() override = default;
 
         void Render() const override;
-        void Update() override;
+        void Update(float deltaTime) override;
         void SetText(const std::string& text);
         void SetPosition(float x, float y);
 

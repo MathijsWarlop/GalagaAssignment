@@ -10,7 +10,7 @@ namespace dae
         FPSCounterComponent(GameObject* pOwner);
         virtual ~FPSCounterComponent() = default;
 
-        void Update() override;
+        void Update(float deltaTime) override;
 
         // Return FPS as a float for decimal precision
         float GetFPS() const { return m_FPS; }

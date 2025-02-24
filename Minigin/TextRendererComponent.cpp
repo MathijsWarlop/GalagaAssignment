@@ -27,7 +27,7 @@ void dae::TextRendererComponent::Render() const
     }
 }
 
-void dae::TextRendererComponent::Update()
+void dae::TextRendererComponent::Update(float)
 {
     if (m_NeedsUpdate)
     {

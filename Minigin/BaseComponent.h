@@ -18,7 +18,7 @@ namespace dae
         BaseComponent& operator=(BaseComponent&& other) = delete;
 
         // Core methods
-        virtual void Update() {}
+        virtual void Update(float ) {  } 
         virtual void FixedUpdate(float fixedTimeStep) { fixedTimeStep; }
         virtual void Render() const {}
 

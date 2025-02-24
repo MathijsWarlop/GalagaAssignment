@@ -10,18 +10,18 @@ namespace dae
     {
     }
 
-    GameObject::~GameObject()
+    GameObject::~GameObject() //WRONG
     {
         // Detach from parent if this object is a child
         if (m_parent)
         {
-            m_parent->RemoveChild(this);
+            m_parent->RemoveChild(this); //parents need to know its deleted
         }
 
         // Clear children
         for (auto& child : m_children)
         {
-            child->m_parent = nullptr;
+            child->m_parent = nullptr; //setparent? // childeren needs to be deleted, branch must be deleted
         }
         m_children.clear();
 
@@ -29,19 +29,20 @@ namespace dae
         m_components.clear();
     }
 
-    void GameObject::Update()
+    void GameObject::Update( float deltaTime)
     {
+       
         //std::cout << "Update() triggered" << std::endl;
         // Update components
         for (auto& component : m_components)
         {
-            component->Update();
+            component->Update(deltaTime);
         }
 
         // Update children
         for (auto& child : m_children)
         {
-            child->Update();
+            child->Update(deltaTime);
         }
 
         if (m_isDirty)
@@ -89,7 +90,7 @@ namespace dae
     {
         // Use the world position for rendering
         const auto& pos = m_worldPosition; // Or use m_transform.GetPosition() if you're using it
-        std::cout << "Rendering at position: (" << pos.x << ", " << pos.y << ")" << std::endl;
+        //std::cout << "Rendering at position: (" << pos.x << ", " << pos.y << ")" << std::endl;
 
         if (m_texture)
         {
@@ -171,7 +172,7 @@ namespace dae
     // Scene graph functionality
     void GameObject::AddChild(GameObject* child)
     {
-        if (child && child != this && !child->m_parent)
+        if (child && child != this) // && !child->m_parent)
         {
             // Detach from previous parent if any
             if (child->m_parent)
@@ -210,7 +211,7 @@ namespace dae
         return m_parent;
     }
 
-    void GameObject::SetParent(GameObject* parent)
+    void GameObject::SetParent(GameObject* parent) 
     {
         if (parent)
         {

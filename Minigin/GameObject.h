@@ -21,7 +21,7 @@ namespace dae
         GameObject& operator=(const GameObject& other) = delete;
         GameObject& operator=(GameObject&& other) = delete;
 
-        virtual void Update();
+        virtual void Update(float deltaTime);
         virtual void FixedUpdate(float fixedTimeStep);
         void LateUpdate();  // Function to clean up deleted components
         virtual void Render() const;

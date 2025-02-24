@@ -6,15 +6,14 @@ dae::FPSCounterComponent::FPSCounterComponent(GameObject* pOwner)
 {
 }
 
-void dae::FPSCounterComponent::Update()
+void dae::FPSCounterComponent::Update(float deltaTime)
 {
     using namespace std::chrono;
 
     // Get the current time
     auto currentTime = high_resolution_clock::now();
 
-    // Compute delta time in seconds
-    float deltaTime = duration<float>(currentTime - m_LastTime).count();
+
     m_LastTime = currentTime; // Update last time
 
     // Increment frame count

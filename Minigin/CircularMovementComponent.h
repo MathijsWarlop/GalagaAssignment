@@ -25,10 +25,11 @@ namespace dae
         }
 
         // Override the Update method to move the GameObject in a circle
-        void Update() override
+        void Update(float deltaTime) override
         {
             // Calculate the new angle
-            m_Angle += m_Speed * 0.016f; // 0.016f is roughly the time for one frame at 60 FPS
+            m_Angle += m_Speed * deltaTime; // Need to get delta time for this tho
+
             if (m_Angle > 2 * M_PI) // Normalize the angle to keep it within 0-2PI
                 m_Angle -= float(2 * M_PI);
 
