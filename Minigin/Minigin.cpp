@@ -108,7 +108,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	circleChild->SetTexture("logo.tga");
 	circleChild->SetPosition(0, 0);
 	circleChild->AddComponent<CircularMovementComponent>(50.f, 9.f);
-	circleParent->AddChild(circleChild.get()); 
+	circleChild->SetParent(circleParent.get());
 
 	scene->Add(circleParent);
 	scene->Add(circleChild);

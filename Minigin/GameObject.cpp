@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include <algorithm>
 #include <iostream>
+
 namespace dae
 {
     GameObject::GameObject()
@@ -10,18 +11,19 @@ namespace dae
     {
     }
 
-    GameObject::~GameObject() //WRONG
+    GameObject::~GameObject()
     {
         // Detach from parent if this object is a child
         if (m_parent)
         {
-            m_parent->RemoveChild(this); //parents need to know its deleted
+            SetParent(nullptr); // Remove from parent
         }
 
         // Clear children
         for (auto& child : m_children)
         {
-            child->m_parent = nullptr; //setparent? // childeren needs to be deleted, branch must be deleted
+            child->MarkForDeletion();
+            child->m_parent = nullptr;
         }
         m_children.clear();
 
@@ -29,10 +31,8 @@ namespace dae
         m_components.clear();
     }
 
-    void GameObject::Update( float deltaTime)
+    void GameObject::Update(float deltaTime)
     {
-       
-        //std::cout << "Update() triggered" << std::endl;
         // Update components
         for (auto& component : m_components)
         {
@@ -89,8 +89,7 @@ namespace dae
     void GameObject::Render() const
     {
         // Use the world position for rendering
-        const auto& pos = m_worldPosition; // Or use m_transform.GetPosition() if you're using it
-        //std::cout << "Rendering at position: (" << pos.x << ", " << pos.y << ")" << std::endl;
+        const auto& pos = m_worldPosition;
 
         if (m_texture)
         {
@@ -117,18 +116,21 @@ namespace dae
 
     void GameObject::SetPosition(float x, float y)
     {
+        // Set the local position in the transform
         m_transform.SetPosition(x, y, 0.0f);
-        UpdateWorldPosition();
-        //std::cout << x << "  " << y << std::endl;
-        SetDirty(); // Mark as dirty when position changes
 
+        // Update the world position
+        UpdateWorldPosition();
+
+        // Mark as dirty to propagate changes to children
+        SetDirty();
     }
+
     glm::vec3& GameObject::GetPosition()
     {
         return m_worldPosition;
-
     }
-    // Dirty flag functionality
+
     void GameObject::SetDirty(bool dirty)
     {
         m_isDirty = dirty;
@@ -149,56 +151,85 @@ namespace dae
 
     void GameObject::UpdateWorldPosition()
     {
-        //std::cout << "UpdateWorldPosition()" << std::endl;
         if (m_parent)
         {
-            //std::cout << "parent" << std::endl;
-            // Calculate world position based on parent's world position
+            // Ensure the parent's world position is up-to-date
+            if (m_parent->IsDirty())
+            {
+                m_parent->UpdateWorldPosition();
+            }
+
+            // Calculate the world position based on the parent's world position and local position
             m_worldPosition = m_parent->m_worldPosition + m_transform.GetPosition();
         }
         else
         {
-            // No parent, so world position is the same as local position
+            // If there's no parent, the world position is the same as the local position
             m_worldPosition = m_transform.GetPosition();
-            //std::cout << m_transform.GetPosition().x << "  " << m_transform.GetPosition().y << std::endl;
-            //std::cout << m_worldPosition.x << "  " << m_worldPosition.y << std::endl;
         }
 
         // Mark as clean
         m_isDirty = false;
-        
     }
 
-    // Scene graph functionality
-    void GameObject::AddChild(GameObject* child)
+    void GameObject::SetParent(GameObject* parent)
     {
-        if (child && child != this) // && !child->m_parent)
+        if (parent == this || IsChild(parent))
         {
-            // Detach from previous parent if any
-            if (child->m_parent)
+            return; // Invalid parent
+        }
+
+        // Store the current world position before changing parents
+        glm::vec3 oldWorldPosition = m_worldPosition;
+
+        // Remove from current parent
+        if (m_parent)
+        {
+            auto it = std::find(m_parent->m_children.begin(), m_parent->m_children.end(), this);
+            if (it != m_parent->m_children.end())
             {
-                child->m_parent->RemoveChild(child);
+                m_parent->m_children.erase(it);
+            }
+        }
+
+        // Set new parent
+        m_parent = parent;
+
+        // Add to new parent's children
+        if (m_parent)
+        {
+            m_parent->m_children.push_back(this);
+
+            // Ensure the parent's world position is up-to-date
+            if (m_parent->IsDirty())
+            {
+                m_parent->UpdateWorldPosition();
             }
 
-            // Attach to this parent
-            m_children.push_back(child);
-            child->m_parent = this;
-            child->SetDirty(); // Mark child as dirty when parent changes
+            // Calculate the new local position relative to the new parent
+            glm::vec3 newLocalPosition = oldWorldPosition - m_parent->m_worldPosition;
+            m_transform.SetPosition(newLocalPosition.x, newLocalPosition.y, newLocalPosition.z);
         }
+        else
+        {
+            // If there's no parent, the local position is the same as the world position
+            m_transform.SetPosition(oldWorldPosition.x, oldWorldPosition.y, oldWorldPosition.z);
+        }
+
+        // Mark as dirty to update world position in the next frame
+        SetDirty();
     }
 
-    void GameObject::RemoveChild(GameObject* child)
+    bool GameObject::IsChild(GameObject* potentialChild) const
     {
-        if (child)
+        for (const auto& child : m_children)
         {
-            auto it = std::find(m_children.begin(), m_children.end(), child);
-            if (it != m_children.end())
+            if (child == potentialChild || child->IsChild(potentialChild))
             {
-                (*it)->m_parent = nullptr;
-                m_children.erase(it);
-                (*it)->SetDirty(); // Mark child as dirty when parent changes
+                return true;
             }
         }
+        return false;
     }
 
     const std::vector<GameObject*>& GameObject::GetChildren() const
@@ -209,18 +240,5 @@ namespace dae
     GameObject* GameObject::GetParent() const
     {
         return m_parent;
-    }
-
-    void GameObject::SetParent(GameObject* parent) 
-    {
-        if (parent)
-        {
-            parent->AddChild(this);
-        }
-        else if (m_parent)
-        {
-            m_parent->RemoveChild(this);
-        }
-        SetDirty(); // Mark as dirty when parent changes
     }
 }

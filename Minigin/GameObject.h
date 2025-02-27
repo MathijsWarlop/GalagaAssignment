@@ -113,13 +113,10 @@ namespace dae
         void RemoveMarkedComponents(); // Function to remove components marked for deletion
 
         // Scene graph functionality
-        void AddChild(GameObject* child);
-        void RemoveChild(GameObject* child);
+        bool IsChild(GameObject* potentialChild) const;
         const std::vector<GameObject*>& GetChildren() const;
         GameObject* GetParent() const;
         void SetParent(GameObject* parent);
-
-        
 
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
