@@ -15,7 +15,7 @@ namespace dae
         {
             // Store the initial position of the owner as the center of rotation
             m_Center = GetOwner()->GetPosition();
-            std::cout << m_Center.x << " " << m_Center.y << std::endl;
+            //std::cout << m_Center.x << " " << m_Center.y << std::endl;
         }
 
         // Override the Update method to move the GameObject in a circle

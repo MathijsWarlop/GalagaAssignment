@@ -17,6 +17,7 @@
 #include "FPSCounterComponent.h"
 #include "TextRendererComponent.h"
 #include "CircularMovementComponent.h"
+#include "GuiComponent.h"
 
 SDL_Window* g_window{};
 
@@ -97,21 +98,24 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	fpsCounterObject->AddComponent<TextRendererComponent>("FPS: 0", 2.f, 2.f);
 	scene->Add(fpsCounterObject);
 
-	//parent-child test
-	auto circleParent = std::make_shared<dae::GameObject>();
-	circleParent->SetTexture("logo.tga");
-	circleParent->SetPosition(216, 180);
-	circleParent->AddComponent<CircularMovementComponent>(60.f, 5.f);
-	
-	
-	auto circleChild = std::make_shared<dae::GameObject>();
-	circleChild->SetTexture("logo.tga");
-	circleChild->SetPosition(0, 0);
-	circleChild->AddComponent<CircularMovementComponent>(50.f, 9.f);
-	circleChild->SetParent(circleParent.get());
+	//parent-child test (circling logos)
+	//auto circleParent = std::make_shared<dae::GameObject>();
+	//circleParent->SetTexture("logo.tga");
+	//circleParent->SetPosition(216, 180);
+	//circleParent->AddComponent<CircularMovementComponent>(60.f, 5.f);
+	//auto circleChild = std::make_shared<dae::GameObject>();
+	//circleChild->SetTexture("logo.tga");
+	//circleChild->SetPosition(0, 0);
+	//circleChild->AddComponent<CircularMovementComponent>(50.f, 9.f);
+	//circleChild->SetParent(circleParent.get());
+	//
+	//scene->Add(circleParent);
+	//scene->Add(circleChild);
 
-	scene->Add(circleParent);
-	scene->Add(circleChild);
+	// Gui Graphs (week3)
+	auto GuiGraph = std::make_shared<dae::GameObject>();
+	GuiGraph->AddComponent<GuiComponent>();
+	scene->Add(GuiGraph);
 
 	auto& input = InputManager::GetInstance();
 

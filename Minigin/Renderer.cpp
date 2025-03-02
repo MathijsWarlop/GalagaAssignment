@@ -7,6 +7,7 @@
 #include "backends\imgui_impl_opengl3.h"
 
 
+
 int GetOpenGLDriverIndex()
 {
 	auto openglIndex = -1;
@@ -43,16 +44,31 @@ void dae::Renderer::Render() const
 	SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderClear(m_renderer);
 
+	// Render game objects
 	SceneManager::GetInstance().Render();
 
+	// Start ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(); //ImGui_ImplSDL2_NewFrame(m_window); has too many arguments
+	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
+
+	// Create an ImGui window for the graph
+	//ImGui::Begin("Test Graph");
+
+	// Update the content of the window using registered GuiComponents
+	for (const auto& guiComponent : m_guiComponents)
+	{
+		guiComponent->UpdateImGui();
+	}
+
+	// End the ImGui window
+	//ImGui::End();
+
+	// Render ImGui
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	
+	// Present the SDL renderer
 	SDL_RenderPresent(m_renderer);
 }
 
@@ -89,3 +105,13 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 }
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }
+
+void dae::Renderer::RegisterGuiComponent(const GuiComponent* guiComponent)
+{
+	m_guiComponents.push_back(guiComponent);
+}
+
+void dae::Renderer::UnregisterGuiComponent(const GuiComponent* guiComponent)
+{
+	m_guiComponents.erase(std::remove(m_guiComponents.begin(), m_guiComponents.end(), guiComponent), m_guiComponents.end());
+}
