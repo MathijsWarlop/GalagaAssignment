@@ -15,7 +15,7 @@ using namespace std;
 namespace dae
 {
     GuiComponent::GuiComponent(GameObject* pOwner)
-        : BaseComponent(pOwner), m_graphTitle("Step Size vs Time")
+        : BaseComponent(pOwner), m_graphTitle("Ex 2")
     {
         // Register this component with the Renderer
         Renderer::GetInstance().RegisterGuiComponent(this);
@@ -29,24 +29,24 @@ namespace dae
 
     void GuiComponent::GenerateTimingData()
     {
-        std::vector<GameObject3D> arr(1 << 26); // Initialize vector with 2^26 elements
+        std::vector<GameObject3D> arr(1 << 26);
 
         m_timingData.clear(); // Clear previous timing data
 
         for (int stepsize = 1; stepsize <= 1024; stepsize *= 2)
         {
-            std::vector<long long> samples(m_numSamples); // Store timing results
+            std::vector<long long> samples(m_numSamples); 
 
             for (int sample = 0; sample < m_numSamples; ++sample)
             {
                 auto start = std::chrono::high_resolution_clock::now();
                 for (int i = 0; i < arr.size(); i += stepsize)
                 {
-                    arr[i].ID *= 2; // Perform the operation
+                    arr[i].ID *= 2; 
                 }
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-                samples[sample] = elapsedTime; // Store the timing result
+                samples[sample] = elapsedTime; 
             }
 
             // Sort the samples to easily remove the highest and lowest values
@@ -75,24 +75,24 @@ namespace dae
 
     void GuiComponent::GenerateTimingDataAlt()
     {
-        std::vector<GameObject3DAlt> arr(1 << 26); // Initialize vector with 2^26 elements
+        std::vector<GameObject3DAlt> arr(1 << 26); 
 
-        m_timingDataAlt.clear(); // Clear previous timing data
+        m_timingDataAlt.clear(); 
 
         for (int stepsize = 1; stepsize <= 1024; stepsize *= 2)
         {
-            std::vector<long long> samples(m_numSamples); // Store timing results
+            std::vector<long long> samples(m_numSamples); 
 
             for (int sample = 0; sample < m_numSamples; ++sample)
             {
                 auto start = std::chrono::high_resolution_clock::now();
                 for (int i = 0; i < arr.size(); i += stepsize)
                 {
-                    arr[i].ID *= 2; // Perform the operation
+                    arr[i].ID *= 2; 
                 }
                 auto end = std::chrono::high_resolution_clock::now();
                 auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-                samples[sample] = elapsedTime; // Store the timing result
+                samples[sample] = elapsedTime; 
             }
 
             // Sort the samples to easily remove the highest and lowest values
@@ -119,6 +119,52 @@ namespace dae
         }
     }
 
+    void GuiComponent::GenerateTimingDataInt()
+    {
+        std::vector<int> arr(1 << 26);
+
+        m_timingDataInt.clear(); // Clear previous timing data
+
+        for (int stepsize = 1; stepsize <= 1024; stepsize *= 2)
+        {
+            std::vector<long long> samples(m_numSamplesInt);
+
+            for (int sample = 0; sample < m_numSamplesInt; ++sample)
+            {
+                auto start = std::chrono::high_resolution_clock::now();
+                for (int i = 0; i < arr.size(); i += stepsize)
+                {
+                    arr[i] *= 2;
+                }
+                auto end = std::chrono::high_resolution_clock::now();
+                auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+                samples[sample] = elapsedTime;
+            }
+
+            // Sort the samples to easily remove the highest and lowest values
+            std::sort(samples.begin(), samples.end());
+
+            // Remove the highest and lowest values (outliers)
+            long long totalTime = 0;
+            for (int i = 1; i < m_numSamplesInt - 1; ++i) // Skip first and last elements
+            {
+                totalTime += samples[i];
+            }
+
+            // Calculate the average time (excluding outliers)
+            double averageTime = totalTime / static_cast<double>(m_numSamplesInt - 2);
+
+            // Store the step size and average time
+            m_timingDataInt.emplace_back(stepsize, averageTime / 1000.0); // Convert to milliseconds
+        }
+
+        // Calculate m_maxScaleInt based on the first result + 100
+        if (!m_timingDataInt.empty())
+        {
+            m_maxScaleInt = static_cast<float>(m_timingDataInt[0].second) + 100.0f;
+        }
+    }
+
    void GuiComponent::UpdateImGui() const
 {
     // Ensure ImGui is within a frame
@@ -128,7 +174,7 @@ namespace dae
     }
 
     // Create an ImGui window for the graph
-    ImGui::Begin("Step Size vs Time");
+    ImGui::Begin("Ex 2");
 
     // Add a slider to control the number of samples
     ImGui::SliderInt("Sample Size", &const_cast<int&>(m_numSamples), 10, 100); // Allow sample size between 1 and 100
@@ -235,7 +281,66 @@ namespace dae
         }
     }
 
-    // End the ImGui window
-    ImGui::End();
-}
+        // End the ImGui window
+        ImGui::End();
+
+        // Second ImGui window for additional controls or information
+        ImGui::Begin("Ex 1");
+
+        // Add a slider to control the number of samples
+        ImGui::SliderInt("Sample Size", &const_cast<int&>(m_numSamplesInt), 10, 100); // Allow sample size between 1 and 100
+
+        // Add a button to generate the timing data for GameObject3D
+        if (ImGui::Button("Generate Graph (int)"))
+        {
+            std::cout << "Generate Graph (int) button clicked\n";
+            const_cast<GuiComponent*>(this)->GenerateTimingDataInt(); // Call GenerateTimingData
+            m_generateGraphInt = true;
+        }
+
+        if (m_generateGraphInt && !m_timingDataInt.empty())
+        {
+            // Prepare the data for ImGui::PlotLines
+            std::vector<float> stepSizes;
+            std::vector<float> averageTimes;
+
+
+            for (const auto& [stepsize, avgTime] : m_timingDataInt)
+            {
+                stepSizes.push_back(static_cast<float>(stepsize));
+                averageTimes.push_back(static_cast<float>(avgTime));
+            }
+
+            // Plot the data using ImGui::PlotLines
+            ImGui::PlotLines(
+                "Int",                         // Label for the graph
+                averageTimes.data(),                    // Pointer to the data
+                static_cast<int>(averageTimes.size()),  // Number of data points
+                0,                                      // Index offset
+                nullptr,                                // Overlay text (optional)
+                m_minScaleInt,                             // Scale minimum
+                m_maxScaleInt,                             // Scale maximum
+                ImVec2(0, 200)                          // Graph size
+            );
+
+            // Display step sizes on the X-axis
+            ImDrawList* drawList = ImGui::GetWindowDrawList(); // Get the draw list for custom rendering
+            ImVec2 graphPos = ImGui::GetCursorScreenPos(); // Get the position of the graph
+            float graphWidth = ImGui::GetContentRegionAvail().x; // Get the width of the graph
+
+            for (size_t i = 0; i < stepSizes.size(); ++i)
+            {
+                // Calculate the X position for each step size label
+                float xPos = graphPos.x + (graphWidth / (stepSizes.size() - 1)) * i;
+
+                // Draw the step size label
+                std::string label = std::to_string(static_cast<int>(stepSizes[i]));
+                ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
+                drawList->AddText(ImVec2(xPos - textSize.x / 2, graphPos.y + 210), IM_COL32_WHITE, label.c_str());
+            }
+        }
+
+        // End the second ImGui window
+        ImGui::End();
+    }
 }
