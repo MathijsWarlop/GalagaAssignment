@@ -40,7 +40,7 @@ namespace dae
             for (int sample = 0; sample < m_numSamples; ++sample)
             {
                 auto start = std::chrono::high_resolution_clock::now();
-                for (int i = 0; i < arr.size(); i += stepsize)
+                for (unsigned int i = 0; i < arr.size(); i += stepsize)
                 {
                     arr[i].ID *= 2; 
                 }
@@ -86,7 +86,7 @@ namespace dae
             for (int sample = 0; sample < m_numSamples; ++sample)
             {
                 auto start = std::chrono::high_resolution_clock::now();
-                for (int i = 0; i < arr.size(); i += stepsize)
+                for (unsigned int i = 0; i < arr.size(); i += stepsize)
                 {
                     arr[i].ID *= 2; 
                 }
@@ -132,7 +132,7 @@ namespace dae
             for (int sample = 0; sample < m_numSamplesInt; ++sample)
             {
                 auto start = std::chrono::high_resolution_clock::now();
-                for (int i = 0; i < arr.size(); i += stepsize)
+                for (unsigned int i = 0; i < arr.size(); i += stepsize)
                 {
                     arr[i] *= 2;
                 }
