@@ -1,131 +1,126 @@
 #include "InputManager.h"
 #include "backends/imgui_impl_sdl2.h"
+#include <iostream>
+#include "Controller.h"
 
-dae::InputManager::InputManager()
+namespace dae
 {
-    // Initialize SDL with controller support
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+    InputManager::InputManager()
     {
-        std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
-        return;
-    }
+        // Check if controllers are connected
+        int numControllers = SDL_NumJoysticks();
+        std::cout << "Number of connected controllers: " << numControllers << std::endl;
 
-    // Check for already connected controllers
-    for (int i = 0; i < SDL_NumJoysticks(); ++i)
-    {
-        if (SDL_IsGameController(i))
+        // Initialize controllers
+        for (int i = 0; i < numControllers; ++i)
         {
-            m_pController = SDL_GameControllerOpen(i);
-            if (m_pController)
-            {
-                std::cout << "Controller connected!\n";
-                break;
+            if (SDL_IsGameController(i)) {
+                m_controllers.emplace_back(std::make_unique<Controller>(i));
+                std::cout << "Controller " << i << " connected!" << std::endl;
+            }
+            else {
+                std::cout << "Controller " << i << " is not a valid game controller." << std::endl;
             }
         }
     }
 
- 
-}
+    InputManager::~InputManager() {}
 
-dae::InputManager::~InputManager()
-{
-    if (m_pController)
+    bool InputManager::ProcessInput()
     {
-        SDL_GameControllerClose(m_pController);
-    }
-    SDL_Quit();
-}
-
-bool dae::InputManager::ProcessInput()
-{
-    SDL_Event e;
-    while (SDL_PollEvent(&e))
-    {
-        switch (e.type)
+        SDL_Event e;
+        while (SDL_PollEvent(&e))
         {
-        case SDL_QUIT:
-            return false;
-
-        case SDL_CONTROLLERDEVICEADDED:
-        case SDL_CONTROLLERDEVICEREMOVED:
-            HandleControllerEvent(e);
-            break;
-
-        case SDL_KEYDOWN:
-            if (m_KeyCommands.contains(e.key.keysym.scancode))
+            // Handle SDL_QUIT event (like clicking the close button)
+            if (e.type == SDL_QUIT)
             {
-                m_KeyCommands[e.key.keysym.scancode]->Execute();
+                std::cout << "Window closed, exiting.\n";
+                return false; // Stop the game loop and exit
             }
-            break;
-        }
 
-        // Process ImGui events
-        ImGui_ImplSDL2_ProcessEvent(&e);
-    }
-
-    // Process controller input
-    ProcessControllerInput();
-
-    return true;
-}
-
-void dae::InputManager::BindCommand(SDL_GameControllerButton button, std::unique_ptr<Command> command) //controller
-{
-    m_ButtonCommands[button] = std::move(command);
-}
-
-void dae::InputManager::BindCommand(SDL_Scancode key, std::unique_ptr<Command> command) //keyboard
-{
-    m_KeyCommands[key] = std::move(command);
-}
-
-void dae::InputManager::UnbindCommand(SDL_GameControllerButton button)
-{
-    m_ButtonCommands.erase(button); 
-}
-
-
-void dae::InputManager::HandleControllerEvent(const SDL_Event& event)
-{
-    if (event.type == SDL_CONTROLLERDEVICEADDED)
-    {
-        // A new controller has been connected
-        if (!m_pController)
-        {
-            int deviceIndex = event.cdevice.which;
-            m_pController = SDL_GameControllerOpen(deviceIndex);
-            if (m_pController)
+            // Process mouse button down and mouse motion events
+            if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEMOTION)
             {
-                std::cout << "Controller connected!\n";
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    //std::cout << "Mouse button pressed at (" << e.button.x << ", " << e.button.y << ")\n";
+                }
+                if (e.type == SDL_MOUSEMOTION)
+                {
+                    //std::cout << "Mouse moved to (" << e.motion.x << ", " << e.motion.y << ")\n";
+                }
             }
-            else
+
+            // Process keyboard events
+            if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
             {
-                std::cerr << "Failed to open controller: " << SDL_GetError() << "\n";
+                const SDL_Scancode scancode = e.key.keysym.scancode;
+                if (SDL_GetKeyboardState(nullptr)[scancode])
+                {
+                    //std::cout << "Key pressed: " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
+                }
+            }
+
+            // Process controller input
+            for (auto& controller : m_controllers)
+            {
+                controller->ProcessInput();
+            }
+
+            // Check for keyboard command bindings
+            for (const auto& [key, command] : m_KeyCommands)
+            {
+                if (command && SDL_GetKeyboardState(nullptr)[key])
+                {
+                    //std::cout << "Executing command for key " << key << std::endl;
+                    command->Execute();
+                }
             }
         }
+
+        return true; // Continue the game loop if no quit event
     }
-    else if (event.type == SDL_CONTROLLERDEVICEREMOVED)
+
+
+
+
+
+    void InputManager::BindCommand(int button, std::unique_ptr<Command> command, bool isButton)
     {
-        // A controller has been disconnected
-        if (m_pController && SDL_GameControllerGetAttached(m_pController) == SDL_FALSE)
+        if (isButton) // Controller button
         {
-            SDL_GameControllerClose(m_pController);
-            m_pController = nullptr;
-            std::cout << "Controller disconnected!\n";
+            m_ButtonCommands[button] = std::move(command);
+            // Bind the command to all controllers
+            for (auto& controller : m_controllers)
+            {
+                controller->BindCommand(button, std::move(m_ButtonCommands[button]));
+            }
+        }
+        else // Keyboard key
+        {
+            m_KeyCommands[button] = std::move(command);
         }
     }
- 
-}
 
-void dae::InputManager::ProcessControllerInput()
-{
-    if (m_pController)
+
+    void InputManager::HandleControllerEvent(int controllerIndex, bool connected)
     {
-        for (const auto& [button, command] : m_ButtonCommands)
+        if (connected)
         {
-            if (SDL_GameControllerGetButton(m_pController, button))
+            m_controllers.emplace_back(std::make_unique<Controller>(controllerIndex));
+            std::cout << "Controller " << controllerIndex << " connected!\n";
+        }
+        else
+        {
+            auto it = std::remove_if(m_controllers.begin(), m_controllers.end(),
+                [&](const std::unique_ptr<Controller>& controller)
+                {
+                    return controller->GetIndex() == controllerIndex;
+                });
+            if (it != m_controllers.end())
             {
-                command->Execute();
+                m_controllers.erase(it);
+                std::cout << "Controller " << controllerIndex << " disconnected!\n";
             }
         }
     }

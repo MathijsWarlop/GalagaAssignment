@@ -49,6 +49,11 @@ void PrintSDLVersion()
 	version = *TTF_Linked_Version();
 	printf("We are linking against SDL_ttf version %u.%u.%u.\n",
 		version.major, version.minor, version.patch);
+
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
+		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		return;  // Or handle the error appropriately
+	}
 }
 
 dae::Minigin::Minigin(const std::string &dataPath)
@@ -119,18 +124,34 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	//GuiGraph->AddComponent<GuiComponent>();
 	//scene->Add(GuiGraph);
 
+	//SHIP 1 (Controller)
+	auto ship1 = std::make_shared<dae::GameObject>();
+	ship1->SetTexture("ship.png");
+	ship1->SetPosition(200, 180);
+	scene->Add(ship1);
+
+	//SHIP 2 (Keyboard)
+	auto ship2 = std::make_shared<dae::GameObject>();
+	ship2->SetTexture("ship.png");
+	ship2->SetPosition(400, 180); 
+	scene->Add(ship2);
+
 	auto& input = InputManager::GetInstance();
 	// Bind commands to controller buttons
-	{
-		// Register Jump Command for both Controller A and Space key
-		//auto jumpCommand = std::make_unique<JumpCommand>();
-		input.BindCommand(SDL_CONTROLLER_BUTTON_A, std::make_unique<JumpCommand>());
-		input.BindCommand(SDL_SCANCODE_SPACE, std::make_unique<JumpCommand>());
-
-		// Register Shoot Command for both Controller X and 'E' key
-		input.BindCommand(SDL_CONTROLLER_BUTTON_X, std::make_unique<ShootCommand>());
-		input.BindCommand(SDL_SCANCODE_E, std::make_unique<ShootCommand>());
-	}
+	//{
+		// For ship1 (using controller buttons)
+		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_UP, std::make_unique<MoveUpCommand>(ship1), true);
+		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_DOWN, std::make_unique<MoveDownCommand>(ship1), true);
+		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_LEFT, std::make_unique<MoveLeftCommand>(ship1), true);
+		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, std::make_unique<MoveRightCommand>(ship1), true);
+	
+		// For ship2 (using keyboard keys)
+		input.BindCommand(SDL_SCANCODE_W, std::make_unique<MoveUpCommand>(ship2), false);
+		input.BindCommand(SDL_SCANCODE_S, std::make_unique<MoveDownCommand>(ship2), false);
+		input.BindCommand(SDL_SCANCODE_A, std::make_unique<MoveLeftCommand>(ship2), false);
+		input.BindCommand(SDL_SCANCODE_D, std::make_unique<MoveRightCommand>(ship2), false);
+	//
+	//}
 
 	// new update loop
 	const float fixed_time_step = 1.0f / 60.0f; // Example: 60 updates per second

@@ -1,9 +1,11 @@
 #pragma once
+
 #include "Singleton.h"
 #include "Command.h"
-#include <SDL.h>
+#include "Controller.h"
 #include <unordered_map>
 #include <memory>
+#include <vector>
 #include <iostream>
 
 namespace dae
@@ -15,17 +17,16 @@ namespace dae
         ~InputManager();
 
         bool ProcessInput();
-        void BindCommand(SDL_GameControllerButton button, std::unique_ptr<Command> command); //controller
-        void BindCommand(SDL_Scancode key, std::unique_ptr<Command> command); //Keyboard
-        void UnbindCommand(SDL_GameControllerButton button);
+
+        // Combine button/key binding functions into one
+        void BindCommand(int inputId, std::unique_ptr<Command> command, bool isButton);
 
     private:
-        void HandleControllerEvent(const SDL_Event& event);
-        void ProcessControllerInput();
+        void HandleControllerEvent(int controllerIndex, bool connected);
 
-        std::unordered_map<SDL_GameControllerButton, std::unique_ptr<Command>> m_ButtonCommands; //Controller
-        std::unordered_map<SDL_Scancode, std::unique_ptr<Command>> m_KeyCommands; //Keyboard
+        std::unordered_map<int, std::unique_ptr<Command>> m_ButtonCommands;
+        std::unordered_map<int, std::unique_ptr<Command>> m_KeyCommands;
 
-        SDL_GameController* m_pController = nullptr;
+        std::vector<std::unique_ptr<Controller>> m_controllers;
     };
 }
