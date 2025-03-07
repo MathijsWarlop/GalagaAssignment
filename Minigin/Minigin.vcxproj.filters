@@ -19,6 +19,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{29f05109-bd5b-49f9-9c1d-6cfdb51b8470}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\inputCommands">
+      <UniqueIdentifier>{1dcd09e1-df72-4d37-8bb0-afc882f58350}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -95,6 +98,12 @@
     </ClInclude>
     <ClInclude Include="GuiComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Header Files\inputCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>Header Files\inputCommands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

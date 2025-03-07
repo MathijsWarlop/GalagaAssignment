@@ -17,7 +17,9 @@
 #include "FPSCounterComponent.h"
 #include "TextRendererComponent.h"
 #include "CircularMovementComponent.h"
-#include "GuiComponent.h"
+#include "Command.h"
+#include "Commands.h"
+//#include "GuiComponent.h"
 
 SDL_Window* g_window{};
 
@@ -113,11 +115,22 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	//scene->Add(circleChild);
 
 	// Gui Graphs (week3)
-	auto GuiGraph = std::make_shared<dae::GameObject>();
-	GuiGraph->AddComponent<GuiComponent>();
-	scene->Add(GuiGraph);
+	//auto GuiGraph = std::make_shared<dae::GameObject>();
+	//GuiGraph->AddComponent<GuiComponent>();
+	//scene->Add(GuiGraph);
 
 	auto& input = InputManager::GetInstance();
+	// Bind commands to controller buttons
+	{
+		// Register Jump Command for both Controller A and Space key
+		//auto jumpCommand = std::make_unique<JumpCommand>();
+		input.BindCommand(SDL_CONTROLLER_BUTTON_A, std::make_unique<JumpCommand>());
+		input.BindCommand(SDL_SCANCODE_SPACE, std::make_unique<JumpCommand>());
+
+		// Register Shoot Command for both Controller X and 'E' key
+		input.BindCommand(SDL_CONTROLLER_BUTTON_X, std::make_unique<ShootCommand>());
+		input.BindCommand(SDL_SCANCODE_E, std::make_unique<ShootCommand>());
+	}
 
 	// new update loop
 	const float fixed_time_step = 1.0f / 60.0f; // Example: 60 updates per second

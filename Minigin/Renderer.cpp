@@ -48,25 +48,19 @@ void dae::Renderer::Render() const
 	SceneManager::GetInstance().Render();
 
 	// Start ImGui frame
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
-
-	// Create an ImGui window for the graph
-	//ImGui::Begin("Test Graph");
+	//ImGui_ImplOpenGL3_NewFrame();
+	//ImGui_ImplSDL2_NewFrame();
+	//ImGui::NewFrame();
 
 	// Update the content of the window using registered GuiComponents
-	for (const auto& guiComponent : m_guiComponents)
-	{
-		guiComponent->UpdateImGui();
-	}
-
-	// End the ImGui window
-	//ImGui::End();
+	//for (const auto& guiComponent : m_guiComponents)
+	//{
+	//	guiComponent->UpdateImGui();
+	//}
 
 	// Render ImGui
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	//ImGui::Render();
+	//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	// Present the SDL renderer
 	SDL_RenderPresent(m_renderer);
@@ -106,12 +100,12 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }
 
-void dae::Renderer::RegisterGuiComponent(const GuiComponent* guiComponent)
-{
-	m_guiComponents.push_back(guiComponent);
-}
-
-void dae::Renderer::UnregisterGuiComponent(const GuiComponent* guiComponent)
-{
-	m_guiComponents.erase(std::remove(m_guiComponents.begin(), m_guiComponents.end(), guiComponent), m_guiComponents.end());
-}
+//void dae::Renderer::RegisterGuiComponent(const GuiComponent* guiComponent)
+//{
+//	m_guiComponents.push_back(guiComponent);
+//}
+//
+//void dae::Renderer::UnregisterGuiComponent(const GuiComponent* guiComponent)
+//{
+//	m_guiComponents.erase(std::remove(m_guiComponents.begin(), m_guiComponents.end(), guiComponent), m_guiComponents.end());
+//}
