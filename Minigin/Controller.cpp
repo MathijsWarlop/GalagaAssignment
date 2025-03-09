@@ -18,7 +18,6 @@ Controller::Controller(int index)
     }
 }
 
-
 Controller::~Controller()
 {
     if (m_Controller)
@@ -31,20 +30,55 @@ void Controller::ProcessInput()
 {
     if (!m_Controller) return;
 
-    // Process controller buttons
-    for (const auto& [button, command] : m_ButtonCommands)
+    SDL_GameControllerUpdate();  // Ensure controller state is updated
+
+    for (const auto& [button, _] : m_PressCommands)
     {
-        if (command && SDL_GameControllerGetButton(m_Controller, static_cast<SDL_GameControllerButton>(button)))
+        bool isPressed = SDL_GameControllerGetButton(m_Controller, static_cast<SDL_GameControllerButton>(button));
+        bool wasPressed = m_PreviousButtonStates[button];
+
+        // Debugging: Output the state of the button
+        //std::cout << "Button " << button << " is " << (isPressed ? "pressed" : "not pressed")
+        //    << ", was " << (wasPressed ? "pressed" : "not pressed") << std::endl;
+
+        if (isPressed && !wasPressed)  // Button just pressed
         {
-            command->Execute();
+            if (m_PressCommands[button]) {
+                m_PressCommands[button]->Execute();
+                //std::cout << "Press command executed!" << std::endl;
+            }
         }
+        else if (isPressed && wasPressed)  // Button held
+        {
+            if (m_HoldCommands[button]) {
+                m_HoldCommands[button]->Execute();
+               // std::cout << "Hold command executed!" << std::endl;
+            }
+        }
+        else if (!isPressed && wasPressed)  // Button released
+        {
+            if (m_ReleaseCommands[button]) {
+                m_ReleaseCommands[button]->Execute();
+                //std::cout << "Release command executed!" << std::endl;
+            }
+        }
+
+        // Update the previous state
+        m_PreviousButtonStates[button] = isPressed;
     }
 }
 
 
-void Controller::BindCommand(int button, std::unique_ptr<Command> command)
+
+
+
+void Controller::BindCommand(int button, std::unique_ptr<Command> pressCommand,
+    std::unique_ptr<Command> holdCommand,
+    std::unique_ptr<Command> releaseCommand)
 {
-    m_ButtonCommands[button] = std::move(command);
+    if (pressCommand)   m_PressCommands[button] = std::move(pressCommand);
+    if (holdCommand)    m_HoldCommands[button] = std::move(holdCommand);
+    if (releaseCommand) m_ReleaseCommands[button] = std::move(releaseCommand);
 }
 
 int Controller::GetIndex() const

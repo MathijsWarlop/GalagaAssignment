@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <set>
 
 namespace dae
 {
@@ -18,15 +19,19 @@ namespace dae
 
         bool ProcessInput();
 
-        // Combine button/key binding functions into one
-        void BindCommand(int inputId, std::unique_ptr<Command> command, bool isButton);
+        // Bind commands for press, hold, and release actions
+        void BindCommand(int button, std::unique_ptr<Command> pressCommand,
+            std::unique_ptr<Command> holdCommand,
+            std::unique_ptr<Command> releaseCommand, bool isButton);
 
     private:
         void HandleControllerEvent(int controllerIndex, bool connected);
+        std::set<int> m_HeldKeys;
+        std::unordered_map<int, std::unique_ptr<Command>> m_PressCommands;
+        std::unordered_map<int, std::unique_ptr<Command>> m_HoldCommands;
+        std::unordered_map<int, std::unique_ptr<Command>> m_ReleaseCommands;
 
-        std::unordered_map<int, std::unique_ptr<Command>> m_ButtonCommands;
-        std::unordered_map<int, std::unique_ptr<Command>> m_KeyCommands;
-
+        std::unordered_map<int, bool> m_KeyStates; // Track key/button states
         std::vector<std::unique_ptr<Controller>> m_controllers;
     };
 }
