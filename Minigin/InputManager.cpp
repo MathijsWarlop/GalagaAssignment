@@ -99,10 +99,13 @@ namespace dae
         if (isControllerButton)
         {
             // GET A WARNING WHEN LOOPING OVER EVERY CONTROLLER, CANT MOVE TO MULTIPLE CUZ ITS AN UNIQUE POINTER
-           m_controllers[0]->BindCommand(button,
-               std::move(pressCommand),
-               std::move(holdCommand),
-               std::move(releaseCommand));
+            if (!m_controllers.empty() && m_controllers[0] != nullptr)
+            {
+                m_controllers[0]->BindCommand(button,
+                    std::move(pressCommand),
+                    std::move(holdCommand),
+                    std::move(releaseCommand));
+            }
             
         }
         else
