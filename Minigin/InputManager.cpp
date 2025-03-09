@@ -94,18 +94,16 @@ namespace dae
 
     void InputManager::BindCommand(int button, std::unique_ptr<Command> pressCommand,
         std::unique_ptr<Command> holdCommand,
-        std::unique_ptr<Command> releaseCommand, bool isButton)
+        std::unique_ptr<Command> releaseCommand, bool isControllerButton)
     {
-        if (isButton)
+        if (isControllerButton)
         {
-            for (auto& controller : m_controllers)
-            {
-                // Move the commands to each controller
-                controller->BindCommand(button,
-                    std::move(pressCommand),
-                    std::move(holdCommand),
-                    std::move(releaseCommand));
-            }
+            // GET A WARNING WHEN LOOPING OVER EVERY CONTROLLER, CANT MOVE TO MULTIPLE CUZ ITS AN UNIQUE POINTER
+           m_controllers[0]->BindCommand(button,
+               std::move(pressCommand),
+               std::move(holdCommand),
+               std::move(releaseCommand));
+            
         }
         else
         {
