@@ -7,6 +7,9 @@
 #include "Transform.h"
 #include "BaseComponent.h"
 #include "Texture2D.h"
+#include "Observer.h"  // Ensure this is included before using Observer
+#include "Event.h"
+#include <iostream>
 
 namespace dae
 {
@@ -41,11 +44,14 @@ namespace dae
             static_assert(std::is_base_of<BaseComponent, T>::value, "T must inherit from BaseComponent");
 
             auto component = std::make_unique<T>(this, std::forward<Args>(args)...);
-            T* rawPtr = component.get();
+            std::cout << "Adding component: " << typeid(T).name() << "\n";
+
+            auto rawPtr = component.get();
             m_components.push_back(std::move(component));
 
             return rawPtr;
         }
+
 
         template <typename T>
         void RemoveComponent() // All components of type T
@@ -118,6 +124,26 @@ namespace dae
         GameObject* GetParent() const;
         void SetParent(GameObject* parent);
 
+
+        // Observer Pattern
+        void RegisterObserver(std::shared_ptr<Observer> observer) {
+            //std::cout << "Observer registering!\n";
+            m_Observers.push_back(observer);
+            //std::cout << "Observers registered: " << m_Observers.size() << "\n";
+        }
+
+        void UnregisterObserver(std::shared_ptr<Observer> observer) {
+            m_Observers.erase(std::remove(m_Observers.begin(), m_Observers.end(), observer), m_Observers.end());
+        }
+
+        void NotifyObservers(const Event& event) {
+            //std::cout << "Observers count before notifying: " << m_Observers.size() << "\n";
+            for (auto observer : m_Observers) {
+                //std::cout << "observer notified \n";
+                if (observer) observer->Notify(event, this);
+            }
+        }
+
     private:
         std::vector<std::unique_ptr<BaseComponent>> m_components;
         Transform m_transform{};
@@ -131,5 +157,9 @@ namespace dae
         // Dirty flag functionality
         bool m_isDirty{ true };                // Indicates if the position has changed
         glm::vec3 m_worldPosition{ 0.0f };    // Cached world position
+
+        std::vector<std::shared_ptr<Observer>> m_Observers;
+
+
     };
 }

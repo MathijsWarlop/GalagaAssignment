@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include <algorithm>
 #include <iostream>
+#include "Observer.h"
+
 
 namespace dae
 {
@@ -241,4 +243,6 @@ namespace dae
     {
         return m_parent;
     }
+
+    
 }

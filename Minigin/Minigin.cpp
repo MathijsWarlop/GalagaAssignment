@@ -17,6 +17,8 @@
 #include "FPSCounterComponent.h"
 #include "TextRendererComponent.h"
 #include "CircularMovementComponent.h"
+#include "HealthComponent.h"
+#include "HealthObserver.h"
 #include "Command.h"
 #include "Commands.h"
 //#include "GuiComponent.h"
@@ -125,64 +127,93 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	//scene->Add(GuiGraph);
 
 	//SHIP 1 (Controller)
+	// Create the ship
 	auto ship1 = std::make_shared<dae::GameObject>();
 	ship1->SetTexture("ship.png");
 	ship1->SetPosition(200, 180);
+
+	auto health =  ship1->AddComponent<dae::HealthComponent>(100); // 100 HP
+
+
+	std::shared_ptr<HealthObserver> healthObserver = std::make_shared<HealthObserver>();
+	ship1->RegisterObserver(healthObserver);
 	scene->Add(ship1);
+	health->TakeDamage(30);
+
 
 	//SHIP 2 (Keyboard)
 	auto ship2 = std::make_shared<dae::GameObject>();
 	ship2->SetTexture("ship.png");
 	ship2->SetPosition(400, 180); 
+	ship2->AddComponent<dae::HealthComponent>(100); // 100 HP
+	auto healthObserver2 = std::make_shared<HealthObserver>();
+	ship2->RegisterObserver(healthObserver2);
 	scene->Add(ship2);
 
 	auto& input = InputManager::GetInstance();
 
 	{ // IMPUTS -> First is PRESSED, second is HELD, thid one is RELEASED
 		// Bind commands to controller buttons for ship1 (controller)
-		const float moveSpeed = 5.0f;
+		constexpr float moveSpeed = 5.0f; // Adjust speed as needed
 
-		// Bind commands to controller buttons for ship1 (controller)
+		// Controller Input for ship1
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_UP,
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 0, -1 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 0, -1 }, moveSpeed),
+			nullptr, true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 0, 1 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 0, 1 }, moveSpeed),
+			nullptr, true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_LEFT,
-			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ -1, 0 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ -1, 0 }, moveSpeed),
+			nullptr, true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
-			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 1, 0 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2{ 1, 0 }, moveSpeed),
+			nullptr, true);
 
-		// Bind commands to keyboard keys for ship2 (keyboard)
+		// Keyboard Input for ship2
 		input.BindCommand(SDL_SCANCODE_W,
-			std::make_unique<MoveCommand>(ship2, glm::vec2(0, -1), moveSpeed),
-			std::make_unique<MoveCommand>(ship2, glm::vec2(0, -1), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 0, -1 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 0, -1 }, moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_S,
-			std::make_unique<MoveCommand>(ship2, glm::vec2(0, 1), moveSpeed),
-			std::make_unique<MoveCommand>(ship2, glm::vec2(0, 1), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 0, 1 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 0, 1 }, moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_A,
-			std::make_unique<MoveCommand>(ship2, glm::vec2(-1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship2, glm::vec2(-1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ -1, 0 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ -1, 0 }, moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_D,
-			std::make_unique<MoveCommand>(ship2, glm::vec2(1, 0), moveSpeed),
-			std::make_unique<MoveCommand>(ship2, glm::vec2(1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 1, 0 }, moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2{ 1, 0 }, moveSpeed),
 			nullptr, false);
+
+		// Controller Input for Testing (X = Take Damage, B = Gain Points)
+		input.BindCommand(SDL_CONTROLLER_BUTTON_X,
+			std::make_unique<TakeDamageCommand>(ship1, 10), // Ship takes 10 damage
+			nullptr, nullptr, true);
+		//input.BindCommand(SDL_CONTROLLER_BUTTON_B,
+		//	std::make_unique<GainPointsCommand>(ship1, 100), // Ship gains 100 points
+		//	nullptr, nullptr, true);
+
+		// Keyboard Input for Testing (K = Take Damage, L = Gain Points)
+		input.BindCommand(SDL_SCANCODE_K,
+			std::make_unique<TakeDamageCommand>(ship2, 10), // Ship takes 10 damage
+			nullptr, nullptr, false);
+		//input.BindCommand(SDL_SCANCODE_L,
+		//	std::make_unique<GainPointsCommand>(ship2, 100), // Ship gains 100 points
+		//	nullptr, nullptr, false);
+
 	}
 
 

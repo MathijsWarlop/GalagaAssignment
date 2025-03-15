@@ -31,6 +31,7 @@ public:
     {
         auto pos = m_Ship->GetPosition();
         m_Ship->SetPosition(pos.x + m_Direction.x * m_Speed, pos.y + m_Direction.y * m_Speed);
+      
     }
 
 private:
@@ -38,58 +39,59 @@ private:
     glm::vec2 m_Direction;
     float m_Speed;
 };
+class TakeDamageCommand : public Command {
+public:
+    TakeDamageCommand(const std::shared_ptr<dae::GameObject>& ship, int damage)
+        : m_Ship(ship), m_Damage(damage) {
+        if (!m_Ship) {
+            std::cerr << "Error: Invalid GameObject passed to TakeDamageCommand!\n";
+        }
+    }
+
+    void Execute() override {
+        if (!m_Ship) {
+            std::cerr << "Error: GameObject is null in TakeDamageCommand!\n";
+            return;
+        }
+
+        auto health = m_Ship->GetComponent<dae::HealthComponent>();
+        if (!health) {
+            std::cerr << "Error: HealthComponent not found on GameObject: " << m_Ship.get() << "\n";
+            return;
+        }
+
+        health->TakeDamage(m_Damage);
+
+        // Debugging information
+        //std::cout << "K pressed\n";
+        //std::cout << "Ship (" << m_Ship.get() << ") took " << m_Damage << " damage. Current HP: " << health->GetHealth() << "\n";
+    }
+
+private:
+    std::shared_ptr<dae::GameObject> m_Ship;
+    int m_Damage;
+};
 
 
-//CHANGE THIS IN A SINGLE COMMAND USING A VECTOR FOR THE DIRECTION
-    //class MoveUpCommand : public Command
-    //{
-    //public:
-    //    explicit MoveUpCommand(std::shared_ptr<dae::GameObject> ship) : m_Ship(ship) {}
-    //    void Execute() override
-    //    {
-    //        auto pos = m_Ship->GetPosition();
-    //        m_Ship->SetPosition(pos.x, pos.y - 5.0f);  // Move up by 5 units
-    //    }
-    //private:
-    //    std::shared_ptr<dae::GameObject> m_Ship;
-    //};
-    //
-    //class MoveDownCommand : public Command
-    //{
-    //public:
-    //    explicit MoveDownCommand(std::shared_ptr<dae::GameObject> ship) : m_Ship(ship) {}
-    //    void Execute() override
-    //    {
-    //        auto pos = m_Ship->GetPosition();
-    //        m_Ship->SetPosition(pos.x, pos.y + 5.0f);  // Move down by 5 units
-    //    }
-    //private:
-    //    std::shared_ptr<dae::GameObject> m_Ship;
-    //};
-    //
-    //class MoveLeftCommand : public Command
-    //{
-    //public:
-    //    explicit MoveLeftCommand(std::shared_ptr<dae::GameObject> ship) : m_Ship(ship) {}
-    //    void Execute() override
-    //    {
-    //        auto pos = m_Ship->GetPosition();
-    //        m_Ship->SetPosition(pos.x - 5.0f, pos.y);  // Move left by 5 units
-    //    }
-    //private:
-    //    std::shared_ptr<dae::GameObject> m_Ship;
-    //};
-    //
-    //class MoveRightCommand : public Command
-    //{
-    //public:
-    //    explicit MoveRightCommand(std::shared_ptr<dae::GameObject> ship) : m_Ship(ship) {}
-    //    void Execute() override
-    //    {
-    //        auto pos = m_Ship->GetPosition();
-    //        m_Ship->SetPosition(pos.x + 5.0f, pos.y);  // Move right by 5 units
-    //    }
-    //private:
-    //    std::shared_ptr<dae::GameObject> m_Ship;
-    //};
+//class GainPointsCommand : public Command {
+//public:
+//    GainPointsCommand(std::shared_ptr<dae::GameObject> ship, int points)
+//        : m_Ship(std::move(ship)), m_Points(points) {
+//    }
+//
+//    void Execute() override {
+//        auto score = m_Ship->GetComponent<dae::ScoreComponent>();
+//        if (score) {
+//            score->AddPoints(m_Points);
+//            std::cout << "Gained " << m_Points << " points! Total Score: " << score->GetScore() << "\n";
+//        }
+//    }
+//
+//private:
+//    std::shared_ptr<dae::GameObject> m_Ship;
+//    int m_Points;
+//};
+
+
+
 

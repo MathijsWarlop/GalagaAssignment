@@ -22,6 +22,9 @@
     <Filter Include="Header Files\inputCommands">
       <UniqueIdentifier>{1dcd09e1-df72-4d37-8bb0-afc882f58350}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Observer">
+      <UniqueIdentifier>{837d6380-5ff3-4d2f-8774-b247b5277c97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Singleton.h">
@@ -107,6 +110,18 @@
     </ClInclude>
     <ClInclude Include="Controller.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthObserver.h">
+      <Filter>Header Files\Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthComponent.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -190,12 +190,16 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPSCounterComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GuiComponent.h" />
+    <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="HealthObserver.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Minigin.h" />
+    <ClInclude Include="Observer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
