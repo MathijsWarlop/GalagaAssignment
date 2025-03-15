@@ -49,7 +49,6 @@ namespace dae
                         m_HeldKeys.insert(key); 
                         //std::cout << "Key " << key << " is pressed." << std::endl;
                     }
-
                     if (m_PressCommands[key]) {
                         m_PressCommands[key]->Execute();
                     }
@@ -61,7 +60,6 @@ namespace dae
                         m_HeldKeys.erase(key); 
                         //std::cout << "Key " << key << " is released." << std::endl;
                     }
-
                     if (m_ReleaseCommands[key]) {
                         m_ReleaseCommands[key]->Execute();
                     }
@@ -85,12 +83,6 @@ namespace dae
         }
         return true;
     }
-
-
-
-
-
-
 
     void InputManager::BindCommand(int button, std::unique_ptr<Command> pressCommand,
         std::unique_ptr<Command> holdCommand,
@@ -116,6 +108,23 @@ namespace dae
                 m_HoldCommands[button] = std::move(holdCommand);
             if (releaseCommand)
                 m_ReleaseCommands[button] = std::move(releaseCommand);
+        }
+    }
+
+    void InputManager::UnbindCommand(int button, bool isControllerButton)
+    {
+        if (isControllerButton)
+        {
+            if (!m_controllers.empty() && m_controllers[0] != nullptr)
+            {
+                m_controllers[0]->UnbindCommand(button);
+            }
+        }
+        else
+        {
+            m_PressCommands.erase(button);
+            m_HoldCommands.erase(button);
+            m_ReleaseCommands.erase(button);
         }
     }
 

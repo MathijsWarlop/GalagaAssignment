@@ -24,6 +24,8 @@ namespace dae
             std::unique_ptr<Command> holdCommand,
             std::unique_ptr<Command> releaseCommand, bool isButton);
 
+        void UnbindCommand(int button, bool isControllerButton);
+
     private:
         void HandleControllerEvent(int controllerIndex, bool connected);
         std::set<int> m_HeldKeys;

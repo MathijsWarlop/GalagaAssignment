@@ -30,7 +30,7 @@ void Controller::ProcessInput()
 {
     if (!m_Controller) return;
 
-    SDL_GameControllerUpdate();  // Ensure controller state is updated
+    SDL_GameControllerUpdate();  
 
     for (const auto& [button, _] : m_PressCommands)
     {
@@ -68,10 +68,6 @@ void Controller::ProcessInput()
     }
 }
 
-
-
-
-
 void Controller::BindCommand(int button, std::unique_ptr<Command> pressCommand,
     std::unique_ptr<Command> holdCommand,
     std::unique_ptr<Command> releaseCommand)
@@ -79,6 +75,13 @@ void Controller::BindCommand(int button, std::unique_ptr<Command> pressCommand,
     if (pressCommand)   m_PressCommands[button] = std::move(pressCommand);
     if (holdCommand)    m_HoldCommands[button] = std::move(holdCommand);
     if (releaseCommand) m_ReleaseCommands[button] = std::move(releaseCommand);
+}
+
+void Controller::UnbindCommand(int button)
+{
+    m_PressCommands.erase(button);
+    m_HoldCommands.erase(button);
+    m_ReleaseCommands.erase(button);
 }
 
 int Controller::GetIndex() const

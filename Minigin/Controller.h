@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Command.h"
 #include <SDL.h>
 #include <unordered_map>
@@ -13,10 +12,11 @@ public:
 
     void ProcessInput();
 
-    // Updated to support press, hold, and release
     void BindCommand(int button, std::unique_ptr<Command> pressCommand,
         std::unique_ptr<Command> holdCommand,
         std::unique_ptr<Command> releaseCommand);
+
+    void UnbindCommand(int button);
 
     int GetIndex() const;
     static int GetConnectedControllerCount();

@@ -140,45 +140,48 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 	{ // IMPUTS -> First is PRESSED, second is HELD, thid one is RELEASED
 		// Bind commands to controller buttons for ship1 (controller)
+		const float moveSpeed = 5.0f;
+
+		// Bind commands to controller buttons for ship1 (controller)
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_UP,
-			std::make_unique<MoveUpCommand>(ship1),
-			std::make_unique<MoveUpCommand>(ship1),
-			std::make_unique<MoveUpCommand>(ship1), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, -1), moveSpeed), true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-			std::make_unique<MoveDownCommand>(ship1),
-			std::make_unique<MoveDownCommand>(ship1),
-			std::make_unique<MoveDownCommand>(ship1), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(0, 1), moveSpeed), true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_LEFT,
-			std::make_unique<MoveLeftCommand>(ship1),
-			std::make_unique<MoveLeftCommand>(ship1),
-			std::make_unique<MoveLeftCommand>(ship1), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(-1, 0), moveSpeed), true);
 
 		input.BindCommand(SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
-			std::make_unique<MoveRightCommand>(ship1),
-			std::make_unique<MoveRightCommand>(ship1),
-			std::make_unique<MoveRightCommand>(ship1), true);
+			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship1, glm::vec2(1, 0), moveSpeed), true);
 
 		// Bind commands to keyboard keys for ship2 (keyboard)
 		input.BindCommand(SDL_SCANCODE_W,
-			std::make_unique<MoveUpCommand>(ship2),
-			std::make_unique<MoveUpCommand>(ship2),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(0, -1), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(0, -1), moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_S,
-			std::make_unique<MoveDownCommand>(ship2),
-			std::make_unique<MoveDownCommand>(ship2),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(0, 1), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(0, 1), moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_A,
-			std::make_unique<MoveLeftCommand>(ship2),
-			std::make_unique<MoveLeftCommand>(ship2),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(-1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(-1, 0), moveSpeed),
 			nullptr, false);
 
 		input.BindCommand(SDL_SCANCODE_D,
-			std::make_unique<MoveRightCommand>(ship2),
-			std::make_unique<MoveRightCommand>(ship2),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(1, 0), moveSpeed),
+			std::make_unique<MoveCommand>(ship2, glm::vec2(1, 0), moveSpeed),
 			nullptr, false);
 	}
 
