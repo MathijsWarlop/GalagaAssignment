@@ -53,18 +53,12 @@ public:
             std::cerr << "Error: GameObject is null in TakeDamageCommand!\n";
             return;
         }
-
         auto health = m_Ship->GetComponent<dae::HealthComponent>();
         if (!health) {
             std::cerr << "Error: HealthComponent not found on GameObject: " << m_Ship.get() << "\n";
             return;
         }
-
         health->TakeDamage(m_Damage);
-
-        // Debugging information
-        //std::cout << "K pressed\n";
-        //std::cout << "Ship (" << m_Ship.get() << ") took " << m_Damage << " damage. Current HP: " << health->GetHealth() << "\n";
     }
 
 private:
@@ -73,24 +67,24 @@ private:
 };
 
 
-//class GainPointsCommand : public Command {
-//public:
-//    GainPointsCommand(std::shared_ptr<dae::GameObject> ship, int points)
-//        : m_Ship(std::move(ship)), m_Points(points) {
-//    }
-//
-//    void Execute() override {
-//        auto score = m_Ship->GetComponent<dae::ScoreComponent>();
-//        if (score) {
-//            score->AddPoints(m_Points);
-//            std::cout << "Gained " << m_Points << " points! Total Score: " << score->GetScore() << "\n";
-//        }
-//    }
-//
-//private:
-//    std::shared_ptr<dae::GameObject> m_Ship;
-//    int m_Points;
-//};
+class GainPointsCommand : public Command {
+public:
+    GainPointsCommand(std::shared_ptr<dae::GameObject> ship, int points)
+        : m_Ship(std::move(ship)), m_Points(points) {
+    }
+
+    void Execute() override {
+        //std::cout << "score command executed\n";
+        auto score = m_Ship->GetComponent<dae::ScoreComponent>();
+        if (score) {
+            score->AddPoints(m_Points);
+        }
+    }
+
+private:
+    std::shared_ptr<dae::GameObject> m_Ship;
+    int m_Points;
+};
 
 
 

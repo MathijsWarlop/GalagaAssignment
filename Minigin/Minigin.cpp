@@ -19,6 +19,8 @@
 #include "CircularMovementComponent.h"
 #include "HealthComponent.h"
 #include "HealthObserver.h"
+#include "ScoreComponent.h"
+#include "ScoreObserver.h"
 #include "Command.h"
 #include "Commands.h"
 //#include "GuiComponent.h"
@@ -107,6 +109,46 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	fpsCounterObject->AddComponent<TextRendererComponent>("FPS: 0", 2.f, 2.f);
 	scene->Add(fpsCounterObject);
 
+	//SHIP UI
+	//SHIP1
+	auto ShipController1UIName = std::make_shared<GameObject>();
+	ShipController1UIName->AddComponent<TextRendererComponent>("Ship1:", 2.f, 20.f);
+	scene->Add(ShipController1UIName);
+	//health
+	auto ShipController1HEALTH = std::make_shared<GameObject>();
+	ShipController1UIName->AddComponent<TextRendererComponent>("HEALTH:", 2.f, 40.f);
+	scene->Add(ShipController1UIName);
+	auto ShipController1UIHealth = std::make_shared<GameObject>();
+	ShipController1UIHealth->AddComponent<TextRendererComponent>("100", 62.f, 40.f);
+	scene->Add(ShipController1UIHealth);
+	//score
+	auto ShipController1SCORE = std::make_shared<GameObject>();
+	ShipController1SCORE->AddComponent<TextRendererComponent>("SCORE:", 2.f, 60.f);
+	scene->Add(ShipController1SCORE);
+	auto ShipController1score = std::make_shared<GameObject>();
+	ShipController1score->AddComponent<TextRendererComponent>("0", 62.f, 60.f);
+	scene->Add(ShipController1score);
+
+	//SHIP2
+	auto ShipController2UIName = std::make_shared<GameObject>();
+	ShipController2UIName->AddComponent<TextRendererComponent>("Ship2:", 500.f, 20.f);
+	scene->Add(ShipController2UIName);
+	//health
+	auto ShipController2HEALTH = std::make_shared<GameObject>();
+	ShipController2HEALTH->AddComponent<TextRendererComponent>("HEALTH:", 500.f, 40.f);
+	scene->Add(ShipController2HEALTH);
+	auto ShipController2UIHealth = std::make_shared<GameObject>();
+	ShipController2UIHealth->AddComponent<TextRendererComponent>("100", 560.f, 40.f);
+	scene->Add(ShipController2UIHealth);
+	//score
+	auto ShipController2SCORE = std::make_shared<GameObject>();
+	ShipController2SCORE->AddComponent<TextRendererComponent>("SCORE:", 500.f, 60.f);
+	scene->Add(ShipController2SCORE);
+	auto ShipController2score = std::make_shared<GameObject>();
+	ShipController2score->AddComponent<TextRendererComponent>("0", 560.f, 60.f);
+	scene->Add(ShipController2score);
+	
+
 	//parent-child test (circling logos)
 	//auto circleParent = std::make_shared<dae::GameObject>();
 	//circleParent->SetTexture("logo.tga");
@@ -131,14 +173,11 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto ship1 = std::make_shared<dae::GameObject>();
 	ship1->SetTexture("ship.png");
 	ship1->SetPosition(200, 180);
-
-	auto health =  ship1->AddComponent<dae::HealthComponent>(100); // 100 HP
-
-
-	std::shared_ptr<HealthObserver> healthObserver = std::make_shared<HealthObserver>();
-	ship1->RegisterObserver(healthObserver);
+	ship1->AddComponent<dae::HealthComponent>(100); // 100 HP
+	ship1->AddComponent<dae::ScoreComponent>();
+	ship1->RegisterObserver(std::make_shared<HealthObserver>(ShipController1UIHealth));
+	ship1->RegisterObserver(std::make_shared<ScoreObserver>(ShipController1score));
 	scene->Add(ship1);
-	health->TakeDamage(30);
 
 
 	//SHIP 2 (Keyboard)
@@ -146,8 +185,9 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	ship2->SetTexture("ship.png");
 	ship2->SetPosition(400, 180); 
 	ship2->AddComponent<dae::HealthComponent>(100); // 100 HP
-	auto healthObserver2 = std::make_shared<HealthObserver>();
-	ship2->RegisterObserver(healthObserver2);
+	ship2->AddComponent<dae::ScoreComponent>(); 
+	ship2->RegisterObserver(std::make_shared<HealthObserver>(ShipController2UIHealth));
+	ship2->RegisterObserver(std::make_shared<ScoreObserver>(ShipController2score));
 	scene->Add(ship2);
 
 	auto& input = InputManager::GetInstance();
@@ -202,17 +242,17 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		input.BindCommand(SDL_CONTROLLER_BUTTON_X,
 			std::make_unique<TakeDamageCommand>(ship1, 10), // Ship takes 10 damage
 			nullptr, nullptr, true);
-		//input.BindCommand(SDL_CONTROLLER_BUTTON_B,
-		//	std::make_unique<GainPointsCommand>(ship1, 100), // Ship gains 100 points
-		//	nullptr, nullptr, true);
+		input.BindCommand(SDL_CONTROLLER_BUTTON_B,
+			std::make_unique<GainPointsCommand>(ship1, 100), // Ship gains 100 points
+			nullptr, nullptr, true);
 
 		// Keyboard Input for Testing (K = Take Damage, L = Gain Points)
 		input.BindCommand(SDL_SCANCODE_K,
 			std::make_unique<TakeDamageCommand>(ship2, 10), // Ship takes 10 damage
 			nullptr, nullptr, false);
-		//input.BindCommand(SDL_SCANCODE_L,
-		//	std::make_unique<GainPointsCommand>(ship2, 100), // Ship gains 100 points
-		//	nullptr, nullptr, false);
+		input.BindCommand(SDL_SCANCODE_L,
+			std::make_unique<GainPointsCommand>(ship2, 100), // Ship gains 100 points
+			nullptr, nullptr, false);
 
 	}
 
@@ -240,6 +280,8 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		auto fpsComponent = fpsCounterObject->GetComponent<FPSCounterComponent>();
 		float fps = fpsComponent->GetFPS();
 		textRenderer->SetText("FPS: " + std::to_string(fps));
+		//
+
 	
 
 		sceneManager.Update(delta_time);
