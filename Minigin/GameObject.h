@@ -44,7 +44,7 @@ namespace dae
             static_assert(std::is_base_of<BaseComponent, T>::value, "T must inherit from BaseComponent");
 
             auto component = std::make_unique<T>(this, std::forward<Args>(args)...);
-            std::cout << "Adding component: " << typeid(T).name() << "\n";
+            //std::cout << "Adding component: " << typeid(T).name() << "\n";
 
             auto rawPtr = component.get();
             m_components.push_back(std::move(component));

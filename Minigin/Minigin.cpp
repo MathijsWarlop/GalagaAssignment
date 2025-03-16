@@ -21,6 +21,7 @@
 #include "HealthObserver.h"
 #include "ScoreComponent.h"
 #include "ScoreObserver.h"
+#include "AchievementObserver.h"
 #include "Command.h"
 #include "Commands.h"
 #include <steam_api.h>
@@ -116,8 +117,8 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	scene->Add(ShipController1UIName);
 	//health
 	auto ShipController1HEALTH = std::make_shared<GameObject>();
-	ShipController1UIName->AddComponent<TextRendererComponent>("HEALTH:", 2.f, 40.f);
-	scene->Add(ShipController1UIName);
+	ShipController1HEALTH->AddComponent<TextRendererComponent>("HEALTH:", 2.f, 40.f);
+	scene->Add(ShipController1HEALTH);
 	auto ShipController1UIHealth = std::make_shared<GameObject>();
 	ShipController1UIHealth->AddComponent<TextRendererComponent>("100", 62.f, 40.f);
 	scene->Add(ShipController1UIHealth);
@@ -179,7 +180,6 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	ship1->RegisterObserver(std::make_shared<ScoreObserver>(ShipController1score));
 	scene->Add(ship1);
 
-
 	//SHIP 2 (Keyboard)
 	auto ship2 = std::make_shared<dae::GameObject>();
 	ship2->SetTexture("ship.png");
@@ -189,6 +189,11 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	ship2->RegisterObserver(std::make_shared<HealthObserver>(ShipController2UIHealth));
 	ship2->RegisterObserver(std::make_shared<ScoreObserver>(ShipController2score));
 	scene->Add(ship2);
+
+	//ARCHIEVEMENTS
+	auto achievementObserver = std::make_shared<AchievementObserver>();
+	ship1->RegisterObserver(achievementObserver);
+	ship2->RegisterObserver(achievementObserver);
 
 	auto& input = InputManager::GetInstance();
 

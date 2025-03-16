@@ -225,6 +225,7 @@ xcopy /Y "$(SolutionDir)3rdParty\steamworks\redistributable_bin\steam_appid.txt"
     <ClInclude Include="..\3rdParty\imgui-1.91.8\imstb_rectpack.h" />
     <ClInclude Include="..\3rdParty\imgui-1.91.8\imstb_textedit.h" />
     <ClInclude Include="..\3rdParty\imgui-1.91.8\imstb_truetype.h" />
+    <ClInclude Include="AchievementObserver.h" />
     <ClInclude Include="BaseComponent.h" />
     <ClInclude Include="CircularMovementComponent.h" />
     <ClInclude Include="Command.h" />

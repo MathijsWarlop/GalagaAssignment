@@ -129,6 +129,9 @@
     <ClInclude Include="ScoreObserver.h">
       <Filter>Header Files\Observer</Filter>
     </ClInclude>
+    <ClInclude Include="AchievementObserver.h">
+      <Filter>Header Files\Observer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
