@@ -28,15 +28,15 @@ namespace dae
         }
 
 
-        int GetHealth() const { return m_Health; }
 
+        int GetHealth() const { return m_Health; }
     private:
         int m_Health;
         int m_MaxHealth;
 
         void NotifyDeath() {
             Event e(make_sdbm_hash("ShipDestroyed"));
-            GetOwner()->NotifyObservers(e);  // Uses GetOwner() correctly
+            GetOwner()->NotifyObservers(e);  
         }
     };
 }
