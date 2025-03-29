@@ -1,6 +1,10 @@
 #pragma once
 #include <iostream>
 #include "command.h"
+#include "GameObject.h"
+#include "HealthComponent.h" // Include HealthComponent header
+#include "ScoreComponent.h"   // Include ScoreComponent header
+
 
 class JumpCommand : public Command
 {

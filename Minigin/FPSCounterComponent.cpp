@@ -1,33 +1,37 @@
+#pragma once
 #include "FPSCounterComponent.h"
+#include "TextRendererComponent.h"  // Ensure this is included
+#include "GameObject.h"
 
-//dae::FPSCounterComponent::FPSCounterComponent(GameObject& pOwner)
-dae::FPSCounterComponent::FPSCounterComponent(GameObject* pOwner)
-    : BaseComponent(pOwner), m_LastTime(std::chrono::high_resolution_clock::now())
+
+namespace dae
 {
-}
-
-void dae::FPSCounterComponent::Update(float deltaTime)
-{
-    using namespace std::chrono;
-
-    // Get the current time
-    auto currentTime = high_resolution_clock::now();
-
-
-    m_LastTime = currentTime; // Update last time
-
-    // Increment frame count
-    ++m_FrameCount;
-    m_ElapsedTime += deltaTime;
-
-    // Update FPS every second
-    if (m_ElapsedTime >= 1.0f)
+    FPSCounterComponent::FPSCounterComponent(GameObject* pOwner)
+        : BaseComponent(pOwner), m_LastTime(std::chrono::high_resolution_clock::now())
     {
-        // Calculate FPS as frames per second (frames / elapsed time)
-        m_FPS = static_cast<float>(m_FrameCount) / m_ElapsedTime;
+    }
 
-        // Reset counters
-        m_FrameCount = 0;
-        m_ElapsedTime = 0.0f;
+    void FPSCounterComponent::Update(float deltaTime)
+    {
+        m_FrameCount++;
+        m_ElapsedTime += deltaTime;
+
+       // std::cout << "Elapsed Time: " << m_ElapsedTime << " | Frame Count: " << m_FrameCount << std::endl;
+
+        if (m_ElapsedTime >= 1.0f)
+        {
+            m_FPS = static_cast<float>(m_FrameCount) / m_ElapsedTime;
+           // std::cout << "FPS: " << m_FPS << std::endl;
+
+            // Get the TextRendererComponent to update the FPS on screen
+            auto textComponent = m_pOwner->GetComponent<dae::TextRendererComponent>();
+            if (textComponent)
+            {
+                textComponent->SetText("FPS: " + std::to_string(static_cast<int>(m_FPS)));
+            }
+
+            m_FrameCount = 0;
+            m_ElapsedTime = 0.0f;
+        }
     }
 }
