@@ -77,20 +77,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <OutDir>$(platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,9 +123,9 @@ xcopy /Y "$(SolutionDir)3rdParty\steamworks\redistributable_bin\steam_appid.txt"
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;steam_api64.lib;steam_api.lib;
+      <AdditionalDependencies>opengl32.lib;steam_api.lib;steam_api64.lib;
 ;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api.lib;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -155,9 +157,9 @@ xcopy /Y "$(SolutionDir)3rdParty\steamworks\redistributable_bin\steam_appid.txt"
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;steam_api64.lib;steam_api.lib;
+      <AdditionalDependencies>opengl32.lib;steam_api64.lib;
 ;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api.lib;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -193,9 +195,9 @@ xcopy /Y "$(SolutionDir)3rdParty\steamworks\redistributable_bin\steam_appid.txt"
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;steam_api64.lib;steam_api.lib;
+      <AdditionalDependencies>opengl32.lib;steam_api.lib;steam_api64.lib;
 ;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api.lib;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -231,9 +233,9 @@ xcopy /Y "$(SolutionDir)3rdParty\steamworks\redistributable_bin\steam_appid.txt"
 </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;steam_api64.lib;steam_api.lib;
+      <AdditionalDependencies>opengl32.lib;steam_api64.lib;
 ;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdParty\steamworks\redistributable_bin;steam_api.lib;steam_api64.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
